@@ -328,7 +328,10 @@ DS.Transaction = Ember.Object.extend({
         type = record.constructor;
 
     var records = bucket.get(type);
-    records.remove(record);
+
+    if (records) {
+      records.remove(record);
+    }
   },
 
   /**

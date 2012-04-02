@@ -487,3 +487,66 @@ test("when a record depends on another record, we can delete the first record an
   equal(get(parentComment, 'isDirty'), false, "parent comment has been saved");
   ok(true, "no exception was thrown");
 });
+
+test("unload new record", function() {
+  var tryToFind;
+
+  store = DS.Store.create({
+    adapter: DS.Adapter.create({
+      find: function() {
+        tryToFind = true;
+      }
+    })
+  });
+
+  var Record = DS.Model.extend({
+    title: DS.attr('string')
+  });
+
+  var record = store.createRecord(Record, {id: 1, title: 'toto'});
+  equal(get(record, 'isNew'), true, "record is new");
+  equal(get(record, 'isDirty'), true, "record is dirty");
+
+
+  record = store.find(Record, 1);
+  equal(get(record, 'id'), 1, "found record with id 1");
+
+  record.unloadRecord();
+
+  equal(get(record, 'isDirty'), false, "record is not dirty");
+  equal(get(record, 'isDeleted'), true, "record is deleted");
+
+  tryToFind = false;
+  store.find(Record, 1);
+  equal(tryToFind, true, "not found record with id 1");
+});
+
+test("unload loaded record", function() {
+  var tryToFind;
+
+  store = DS.Store.create({
+    adapter: DS.Adapter.create({
+      find: function() {
+        tryToFind = true;
+      }
+    })
+  });
+
+  var Record = DS.Model.extend({
+    title: DS.attr('string')
+  });
+
+  store.load(Record, {id: 1, title: 'toto'});
+  var record = store.find(Record, 1);
+
+  equal(get(record, 'isNew'), false, "record is not new");
+
+  record.unloadRecord();
+
+  equal(get(record, 'isDirty'), false, "record is not dirty");
+  equal(get(record, 'isDeleted'), true, "record is deleted");
+
+  tryToFind = false;
+  store.find(Record, 1);
+  equal(tryToFind, true, "not found record with id 1");
+});

@@ -847,6 +847,13 @@ DS.Store = Ember.Object.extend({
     return record;
   },
 
+  unloadRecord: function(type, clientId, id) {
+    var typeMap = this.typeMapFor(type);
+
+    if (id) { delete typeMap.idToCid[id]; }
+    delete typeMap.cidToHash[clientId];
+  },
+
   destroy: function() {
     if (get(DS, 'defaultStore') === this) {
       set(DS, 'defaultStore', null);

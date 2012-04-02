@@ -232,6 +232,23 @@ DS.Model = Ember.Object.extend(Ember.Evented, {
     this.send('deleteRecord');
   },
 
+  unloadRecord: function() {
+    var store = get(this, 'store'),
+        record = this;
+
+    this.deleteRecord();
+
+    get(this, 'stateManager').goToState('deleted.saved');
+
+    this.withTransaction(function(t) {
+      t.modelBecameClean('deleted', record);
+    });
+
+    if (store) {
+      store.unloadRecord(this.constructor, get(this, 'clientId'), get(this, 'id'));
+    }
+  },
+
   waitingOn: function(record) {
     this.send('waitingOn', record);
   },
