@@ -222,6 +222,10 @@ DS.Store = Ember.Object.extend({
     record.send('deleteRecord');
   },
 
+  unloadRecord: function(record) {
+    record.unloadRecord();
+  },
+
   // ................
   // . FIND RECORDS .
   // ................
@@ -847,7 +851,7 @@ DS.Store = Ember.Object.extend({
     return record;
   },
 
-  unloadRecord: function(type, clientId, id) {
+  _unloadRecord: function(type, clientId, id) {
     var typeMap = this.typeMapFor(type);
 
     if (id) { delete typeMap.idToCid[id]; }

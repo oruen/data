@@ -233,19 +233,17 @@ DS.Model = Ember.Object.extend(Ember.Evented, {
   },
 
   unloadRecord: function() {
-    var store = get(this, 'store'),
-        record = this;
+    var store = get(this, 'store');
 
-    this.deleteRecord();
+    this.send('deleteRecord');
 
-    get(this, 'stateManager').goToState('deleted.saved');
-
-    this.withTransaction(function(t) {
-      t.modelBecameClean('deleted', record);
-    });
+    if (get(this, 'isDirty')) {
+      this.send('willCommit');
+      this.send('didCommit');
+    }
 
     if (store) {
-      store.unloadRecord(this.constructor, get(this, 'clientId'), get(this, 'id'));
+      store._unloadRecord(this.constructor, get(this, 'clientId'), get(this, 'id'));
     }
   },
 
